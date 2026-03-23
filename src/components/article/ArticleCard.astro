@@ -1,0 +1,77 @@
+---
+import type { Article } from '@/lib/articles';
+import { formatDate, calcReadingTime } from '@/lib/articles';
+import CategoryBadge from './CategoryBadge.astro';
+import type { CategorySlug } from '@/config/site';
+
+interface Props {
+  article: Article;
+  featured?: boolean;
+}
+
+const { article, featured = false } = Astro.props;
+const { title, description, pubDate, category, tags, author, heroImage } = article.data;
+const readingTime = calcReadingTime(article.body ?? '');
+---
+
+<article class:list={['article-card overflow-hidden', featured ? 'flex flex-col sm:flex-row' : '']}>
+  {/* アイキャッチ画像 */}
+  {
+    heroImage && (
+      <div
+        class:list={[
+          'overflow-hidden bg-zinc-100 dark:bg-zinc-800',
+          featured ? 'sm:w-2/5 flex-shrink-0' : 'aspect-video w-full',
+        ]}
+      >
+        <img
+          src={heroImage}
+          alt={title}
+          class="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    )
+  }
+  {
+    !heroImage && (
+      <div
+        class:list={[
+          'flex items-center justify-center bg-gradient-to-br from-primary-50 to-accent-400/20 dark:from-primary-950 dark:to-accent-700/20',
+          featured ? 'sm:w-2/5 flex-shrink-0 min-h-48' : 'aspect-video w-full',
+        ]}
+      >
+        <span class="text-4xl opacity-30">📋</span>
+      </div>
+    )
+  }
+
+  <!-- コンテンツ -->
+  <div class="flex flex-col flex-1 p-5">
+    <div class="mb-3 flex items-center gap-2">
+      <CategoryBadge category={category as CategorySlug} size="sm" />
+    </div>
+
+    <h2 class:list={['font-bold text-zinc-900 dark:text-zinc-50 leading-snug', featured ? 'text-xl' : 'text-base line-clamp-2']}>
+      <a
+        href={`/articles/${article.slug}`}
+        class="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+      >
+        {title}
+      </a>
+    </h2>
+
+    <p class:list={['mt-2 text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed', featured ? 'line-clamp-3' : 'line-clamp-2']}>
+      {description}
+    </p>
+
+    <div class="mt-auto pt-4 flex items-center justify-between text-xs text-zinc-400 dark:text-zinc-500">
+      <span>{author}</span>
+      <div class="flex items-center gap-3">
+        <span>読了 {readingTime}分</span>
+        <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+      </div>
+    </div>
+  </div>
+</article>

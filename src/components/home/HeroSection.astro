@@ -1,0 +1,65 @@
+---
+import { SITE } from '@/config/site';
+---
+
+<section class="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+  <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+    <div class="max-w-2xl">
+      <!-- カテゴリラベル -->
+      <div class="mb-5 flex items-center gap-2">
+        <span class="h-px w-8 bg-primary-900 dark:bg-primary-400"></span>
+        <span class="text-xs font-semibold uppercase tracking-widest text-primary-900 dark:text-primary-400">
+          AI × 人事労務 実践メディア
+        </span>
+      </div>
+
+      <!-- メインコピー（左揃え） -->
+      <h1 class="text-3xl font-semibold leading-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl lg:text-5xl">
+        {SITE.tagline}
+      </h1>
+
+      <p class="mt-5 text-base text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-xl">
+        社会保険・労務管理の複雑な実務を、AIと自動化ツールで解決する。<br />
+        社労士・人事担当者・経営者のための実践型B2Bメディア。
+      </p>
+
+      <!-- CTA -->
+      <div class="mt-8 flex flex-wrap items-center gap-3">
+        <a
+          href="/articles"
+          class="inline-flex items-center gap-2 rounded-lg bg-primary-900 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-primary-800 dark:bg-primary-700 dark:hover:bg-primary-600"
+        >
+          記事を読む
+          <span aria-hidden="true">→</span>
+        </a>
+        <a
+          href="/about"
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 px-6 py-3 text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-600"
+        >
+          このメディアについて
+        </a>
+      </div>
+
+      <!-- カテゴリ一覧（テキストリンク） -->
+      <div class="mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-zinc-100 pt-8 dark:border-zinc-800">
+        <span class="text-xs text-zinc-400 dark:text-zinc-500">カテゴリ:</span>
+        {
+          [
+            { href: '/categories/jitsumu', label: '実務解説' },
+            { href: '/categories/ai-katsuyo', label: 'AI活用' },
+            { href: '/categories/automation', label: '自動化フロー' },
+            { href: '/categories/law-update', label: '法改正' },
+            { href: '/categories/career', label: 'キャリア' },
+          ].map((cat) => (
+            <a
+              href={cat.href}
+              class="text-sm text-zinc-500 hover:text-primary-900 dark:text-zinc-400 dark:hover:text-primary-300 transition-colors"
+            >
+              {cat.label}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,28 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import HeroSection from '@/components/home/HeroSection.astro';
+import FeaturedGrid from '@/components/home/FeaturedGrid.astro';
+import CategorySection from '@/components/home/CategorySection.astro';
+import { getFeaturedArticles, getArticlesByCategory } from '@/lib/articles';
+import { SITE, CATEGORIES, type CategorySlug } from '@/config/site';
+
+const featured = await getFeaturedArticles(3);
+
+const categoryArticles = await Promise.all(
+  Object.keys(CATEGORIES).map(async (cat) => ({
+    cat: cat as CategorySlug,
+    articles: await getArticlesByCategory(cat),
+  }))
+);
+---
+
+<BaseLayout title={SITE.name} description={SITE.description}>
+  <HeroSection />
+  <FeaturedGrid articles={featured} />
+
+  <div class="pb-16">
+    {categoryArticles.map(({ cat, articles }) => (
+      <CategorySection category={cat} articles={articles} />
+    ))}
+  </div>
+</BaseLayout>

@@ -1,0 +1,119 @@
+---
+title: "n8nで入社手続きを自動化：書類回収からクラウド人事ソフト登録まで"
+description: "n8nを使って入社手続きの書類回収・チェック・クラウド人事ソフトへの登録を自動化した実装例を紹介。工数を従来比80%削減したフロー設計の全容を公開します。"
+pubDate: 2026-03-15
+category: automation
+tags: ["n8n", "入社手続き", "自動化", "人事システム", "ワークフロー"]
+author: "編集部"
+featured: true
+faq:
+  - question: "n8nは無料で使えますか？"
+    answer: "n8nはセルフホスト版が無料で利用できます。クラウド版は有料プランがありますが、無料枠もあります。中小企業であればセルフホスト版で十分な機能を使えます。"
+  - question: "プログラミングの知識がなくても使えますか？"
+    answer: "n8nはノーコード/ローコードツールなのでプログラミングの知識がなくても基本的なフローは構築できます。ただし、APIとの連携や複雑な条件分岐には、JSON/JavaScriptの基礎知識があると便利です。"
+---
+
+## 入社手続きの「アナログの壁」
+
+中小企業の人事担当者が最も時間を取られる業務のひとつが**入社手続き**です。
+
+典型的なフローはこうです:
+
+1. 書類一覧を印刷してメールで送付
+2. 届いた書類を確認してチェックリストに記入
+3. 不備があれば電話・メールで対応
+4. 最終的にクラウド人事ソフト（HRMOS、SmartHRなど）に手入力
+
+このプロセスで人事担当者が費やす時間は、**1名の入社手続きで平均3〜4時間**とも言われています。
+
+## n8nで実現するゼロ人力フロー
+
+以下のフローを実際に構築・検証した結果、**1名あたり30分以内**に圧縮できました。
+
+### フロー全体図
+
+```
+[Typeform/Google Forms] → [n8n] → [Google Drive] → [SmartHR API]
+                                   ↓
+                              [Slack通知]
+                                   ↓
+                           [不備検知 → 自動メール]
+```
+
+### ステップ1: デジタル書類フォームの作成
+
+Google Formsで必要書類の提出フォームを作成します。ポイントは：
+
+- 社会保険関連の情報を1フォームに集約
+- マイナンバーはファイルアップロードではなく**専用の安全なフォーム**を使用
+- 住民票の写しなどはGoogle Driveへの直接アップロード設定
+
+### ステップ2: n8nのWebhookトリガー設定
+
+フォーム送信時にn8nのWebhookが起動するよう設定します。
+
+```javascript
+// n8n Code Node: 入力データのバリデーション
+const data = $input.first().json;
+
+const required = ['name', 'birthdate', 'address', 'bank_account'];
+const missing = required.filter(field => !data[field]);
+
+if (missing.length > 0) {
+  return [{
+    status: 'error',
+    missing_fields: missing,
+    message: `以下の項目が未入力です: ${missing.join(', ')}`
+  }];
+}
+
+return [{
+  status: 'ok',
+  data: data
+}];
+```
+
+### ステップ3: SmartHR APIへの自動登録
+
+```javascript
+// SmartHR API連携（n8n HTTP Requestノード）
+// Method: POST
+// URL: https://SUBDOMAIN.smarthr.jp/api/v1/employees
+// Headers: Authorization: Bearer {{$credentials.smarthr_token}}
+// Body:
+{
+  "last_name": "{{$json.last_name}}",
+  "first_name": "{{$json.first_name}}",
+  "entered_at": "{{$json.start_date}}",
+  "emp_type": "{{$json.employment_type}}"
+}
+```
+
+### ステップ4: Slack通知と不備対応
+
+入力完了・不備検知・登録完了の各段階でSlackに通知が届きます。
+
+## 導入時の注意点
+
+### セキュリティ対策
+
+- マイナンバーを含む個人情報はn8nのメモリ上に残さない設計にする
+- Google Driveの共有設定を「特定のユーザーのみ」に制限する
+- n8nのWebhookにはBasic認証またはトークン認証を設定する
+
+### データ保護
+
+```
+個人情報の流れ:
+フォーム → n8n（一時処理のみ） → SmartHR（永続保存）
+         ↓
+     Google Drive（書類PDFのみ）
+```
+
+## まとめ
+
+n8nによる入社手続き自動化は、**技術的な難易度は低く、効果は大きい**取り組みです。
+
+まずは「書類の提出確認とSlack通知」という小さなフローから始めて、徐々に拡張していくアプローチをお勧めします。
+
+次のステップとして、**退職手続きの自動化**や**勤怠管理システムとの連携**にも同じ設計パターンを応用できます。

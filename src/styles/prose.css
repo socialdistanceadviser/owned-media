@@ -1,0 +1,106 @@
+/*
+ * 記事本文のスタイル
+ * @tailwindcss/typography の prose クラスをカスタマイズ
+ */
+.prose {
+  @apply max-w-none;
+  line-height: 1.9;
+}
+
+/* 見出し */
+.prose h2 {
+  @apply mt-12 mb-4 border-b-2 border-primary-500 pb-2 text-2xl font-bold text-zinc-900 dark:text-zinc-50;
+}
+
+.prose h3 {
+  @apply mt-8 mb-3 text-xl font-semibold text-zinc-800 dark:text-zinc-100;
+}
+
+.prose h4 {
+  @apply mt-6 mb-2 text-lg font-semibold text-zinc-700 dark:text-zinc-200;
+}
+
+/* リンク */
+.prose a {
+  @apply font-medium text-primary-600 underline decoration-primary-300 underline-offset-2
+         transition-colors hover:text-primary-700 hover:decoration-primary-500
+         dark:text-primary-400 dark:decoration-primary-700 dark:hover:text-primary-300;
+}
+
+/* コールアウト（引用ブロック） */
+.prose blockquote {
+  @apply rounded-r-lg border-l-4 border-primary-500 bg-primary-50 px-5 py-4
+         not-italic text-zinc-700 dark:bg-primary-900/20 dark:text-zinc-300;
+}
+
+.prose blockquote p {
+  @apply m-0;
+}
+
+/* コードブロック */
+.prose pre {
+  @apply rounded-xl;
+}
+
+.prose code:not(pre code) {
+  @apply rounded bg-zinc-100 px-1.5 py-0.5 text-sm font-mono text-primary-700
+         dark:bg-zinc-800 dark:text-primary-300;
+}
+
+.prose code:not(pre code)::before,
+.prose code:not(pre code)::after {
+  content: '';
+}
+
+/* テーブル */
+.prose table {
+  @apply w-full border-collapse overflow-hidden rounded-lg;
+}
+
+.prose thead {
+  @apply bg-zinc-100 dark:bg-zinc-800;
+}
+
+.prose th {
+  @apply px-4 py-3 text-left text-sm font-semibold text-zinc-700 dark:text-zinc-300;
+}
+
+.prose td {
+  @apply border-t border-zinc-200 px-4 py-3 text-sm dark:border-zinc-700;
+}
+
+.prose tr:hover td {
+  @apply bg-zinc-50 dark:bg-zinc-800/50;
+}
+
+/* 画像 */
+.prose img {
+  @apply rounded-xl shadow-sm;
+}
+
+/* リスト */
+.prose ul {
+  @apply space-y-1;
+}
+
+.prose ol {
+  @apply space-y-1;
+}
+
+/* 区切り線 */
+.prose hr {
+  @apply my-10 border-zinc-200 dark:border-zinc-700;
+}
+
+/* NOTE / WARNING / TIP カスタムブロック */
+.prose .note {
+  @apply my-6 rounded-lg border border-sky-200 bg-sky-50 p-4 dark:border-sky-800 dark:bg-sky-900/20;
+}
+
+.prose .warning {
+  @apply my-6 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20;
+}
+
+.prose .tip {
+  @apply my-6 rounded-lg border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-900/20;
+}

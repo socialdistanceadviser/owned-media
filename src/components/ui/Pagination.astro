@@ -1,0 +1,83 @@
+---
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  baseUrl: string;
+}
+
+const { currentPage, totalPages, baseUrl } = Astro.props;
+
+function pageUrl(page: number) {
+  return page === 1 ? baseUrl : `${baseUrl}/${page}`;
+}
+
+const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+// 表示するページ番号（現在ページ前後2ページ + 最初/最後）
+const visiblePages = pages.filter(
+  (p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2
+);
+---
+
+{
+  totalPages > 1 && (
+    <nav aria-label="ページネーション" class="flex items-center justify-center gap-1 py-8">
+      {/* 前へ */}
+      {currentPage > 1 ? (
+        <a
+          href={pageUrl(currentPage - 1)}
+          class="flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-200 text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800"
+          aria-label="前のページ"
+        >
+          ←
+        </a>
+      ) : (
+        <span class="flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-100 text-zinc-300 dark:border-zinc-800 dark:text-zinc-600">
+          ←
+        </span>
+      )}
+
+      {/* ページ番号 */}
+      {visiblePages.map((page, i) => {
+        const prev = visiblePages[i - 1];
+        const showEllipsis = prev && page - prev > 1;
+        return (
+          <>
+            {showEllipsis && (
+              <span class="flex h-10 w-10 items-center justify-center text-zinc-400">…</span>
+            )}
+            {page === currentPage ? (
+              <span
+                aria-current="page"
+                class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-600 font-medium text-white"
+              >
+                {page}
+              </span>
+            ) : (
+              <a
+                href={pageUrl(page)}
+                class="flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-200 text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800"
+              >
+                {page}
+              </a>
+            )}
+          </>
+        );
+      })}
+
+      {/* 次へ */}
+      {currentPage < totalPages ? (
+        <a
+          href={pageUrl(currentPage + 1)}
+          class="flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-200 text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800"
+          aria-label="次のページ"
+        >
+          →
+        </a>
+      ) : (
+        <span class="flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-100 text-zinc-300 dark:border-zinc-800 dark:text-zinc-600">
+          →
+        </span>
+      )}
+    </nav>
+  )
+}

@@ -1,0 +1,158 @@
+---
+import { SITE, CATEGORIES } from '@/config/site';
+import ThemeToggle from '@/components/ui/ThemeToggle';
+
+const navItems = Object.entries(CATEGORIES).map(([slug, cat]) => ({
+  href: `/categories/${slug}`,
+  label: cat.label,
+}));
+
+const currentPath = Astro.url.pathname;
+---
+
+<!-- ダークモード初期化スクリプト（フラッシュ防止） -->
+<script is:inline>
+  (function () {
+    const stored = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (stored === 'dark' || (!stored && prefersDark)) {
+      document.documentElement.classList.add('dark');
+    }
+  })();
+</script>
+
+<header class="sticky top-0 z-50 border-b border-zinc-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/95">
+  <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+    <!-- ロゴ -->
+    <a href="/" class="flex items-center gap-2 group">
+      <div class="flex h-8 w-8 items-center justify-center rounded-md bg-primary-900 text-white text-xs font-bold group-hover:bg-primary-800 transition-colors dark:bg-primary-700">
+        AI
+      </div>
+      <span class="font-semibold text-zinc-900 dark:text-zinc-50 text-sm sm:text-base">
+        {SITE.name}
+      </span>
+    </a>
+
+    <!-- デスクトップナビ -->
+    <nav class="hidden lg:flex items-center gap-1" aria-label="メインナビゲーション">
+      {
+        navItems.map((item) => (
+          <a
+            href={item.href}
+            class:list={[
+              'rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+              currentPath.startsWith(item.href)
+                ? 'text-primary-900 font-semibold dark:text-primary-300'
+                : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100',
+            ]}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+      <a
+        href="/about"
+        class:list={[
+          'rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+          currentPath === '/about'
+            ? 'text-primary-900 font-semibold dark:text-primary-300'
+            : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100',
+        ]}
+      >
+        このメディアについて
+      </a>
+    </nav>
+
+    <!-- 右側コントロール -->
+    <div class="flex items-center gap-2">
+      <ThemeToggle client:load />
+
+      <!-- モバイルメニューボタン -->
+      <button
+        id="mobile-menu-btn"
+        class="lg:hidden rounded-lg p-2 text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+        aria-label="メニューを開く"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <svg
+          id="menu-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="4" y1="6" x2="20" y2="6" />
+          <line x1="4" y1="12" x2="20" y2="12" />
+          <line x1="4" y1="18" x2="20" y2="18" />
+        </svg>
+        <svg
+          id="close-icon"
+          class="hidden"
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- モバイルメニュー -->
+  <div
+    id="mobile-menu"
+    class="hidden lg:hidden border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950"
+  >
+    <nav class="flex flex-col px-4 py-3 gap-1">
+      {
+        navItems.map((item) => (
+          <a
+            href={item.href}
+            class:list={[
+              'rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+              currentPath.startsWith(item.href)
+                ? 'text-primary-900 font-semibold dark:text-primary-300'
+                : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200',
+            ]}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+      <a
+        href="/about"
+        class="rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 transition-colors"
+      >
+        このメディアについて
+      </a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const btn = document.getElementById('mobile-menu-btn');
+  const menu = document.getElementById('mobile-menu');
+  const menuIcon = document.getElementById('menu-icon');
+  const closeIcon = document.getElementById('close-icon');
+
+  btn?.addEventListener('click', () => {
+    const isOpen = menu?.classList.contains('hidden');
+    menu?.classList.toggle('hidden', !isOpen);
+    menuIcon?.classList.toggle('hidden', isOpen!);
+    closeIcon?.classList.toggle('hidden', !isOpen);
+    btn.setAttribute('aria-expanded', String(isOpen));
+  });
+</script>

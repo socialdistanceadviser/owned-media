@@ -1,0 +1,33 @@
+---
+import ListLayout from '@/layouts/ListLayout.astro';
+import ArticleCard from '@/components/article/ArticleCard.astro';
+import Pagination from '@/components/ui/Pagination.astro';
+import { getPublishedArticles } from '@/lib/articles';
+import { SITE } from '@/config/site';
+
+const allArticles = await getPublishedArticles();
+const page = Number(Astro.url.searchParams.get('page') ?? '1');
+const perPage = SITE.postsPerPage;
+const totalPages = Math.max(1, Math.ceil(allArticles.length / perPage));
+const articles = allArticles.slice((page - 1) * perPage, page * perPage);
+---
+
+<ListLayout
+  title="記事一覧"
+  description="AI×人事労務メディアの全記事一覧。人事労務の実務解説からAI活用、自動化フロー、法改正情報まで。"
+  heading="記事一覧"
+  subheading={`全${allArticles.length}件の記事`}
+>
+  {
+    articles.length === 0 ? (
+      <p class="text-center text-zinc-400 py-16">記事がまだありません。</p>
+    ) : (
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {articles.map((article) => (
+          <ArticleCard article={article} />
+        ))}
+      </div>
+    )
+  }
+  <Pagination currentPage={page} totalPages={totalPages} baseUrl="/articles" />
+</ListLayout>

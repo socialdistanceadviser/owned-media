@@ -1,0 +1,45 @@
+{
+  "New Article Frontmatter": {
+    "prefix": "article",
+    "description": "AI×人事労務メディア 記事フロントマターテンプレート",
+    "body": [
+      "---",
+      "title: \"$1\"",
+      "description: \"$2\"",
+      "pubDate: ${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE}",
+      "category: ${3|jitsumu,ai-katsuyo,automation,law-update,career|}",
+      "tags: [\"$4\"]",
+      "author: \"${5:編集部}\"",
+      "draft: true",
+      "featured: false",
+      "---",
+      "",
+      "## はじめに",
+      "",
+      "$0",
+      "",
+      "## まとめ",
+      ""
+    ]
+  },
+  "FAQ Block": {
+    "prefix": "faq",
+    "description": "FAQフロントマターブロック（リッチリザルト対応）",
+    "body": [
+      "faq:",
+      "  - question: \"$1\"",
+      "    answer: \"$2\"",
+      "  - question: \"$3\"",
+      "    answer: \"$4\""
+    ]
+  },
+  "Article Table": {
+    "prefix": "tbl",
+    "description": "Markdownテーブル（3列）",
+    "body": [
+      "| $1 | $2 | $3 |",
+      "|---|---|---|",
+      "| $4 | $5 | $6 |"
+    ]
+  }
+}

@@ -1,0 +1,219 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+import MetaTags from '@/components/seo/MetaTags.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import Header from '@/components/navigation/Header.astro';
+import Footer from '@/components/navigation/Footer.astro';
+import Breadcrumb from '@/components/ui/Breadcrumb.astro';
+import CategoryBadge from '@/components/article/CategoryBadge.astro';
+import TableOfContents from '@/components/article/TableOfContents';
+import '@/styles/global.css';
+import '@/styles/prose.css';
+import { SITE, CATEGORIES, type CategorySlug } from '@/config/site';
+import { formatDate, calcReadingTime } from '@/lib/articles';
+
+interface Props {
+  article: CollectionEntry<'articles'>;
+  headings: { depth: number; slug: string; text: string }[];
+}
+
+const { article, headings } = Astro.props;
+const { title, description, pubDate, updatedDate, category, tags, author, authorTitle, heroImage, ogImage, noindex, faq } = article.data;
+
+const tocItems = headings
+  .filter((h) => h.depth === 2 || h.depth === 3)
+  .map((h) => ({ id: h.slug, text: h.text, level: h.depth }));
+
+const readingTime = calcReadingTime(article.body ?? '');
+const canonicalUrl = `${SITE.url}/articles/${article.slug}`;
+const catInfo = CATEGORIES[category as CategorySlug];
+
+const breadcrumbs = [
+  { name: 'ホーム', url: SITE.url },
+  { name: catInfo.label, url: `${SITE.url}/categories/${category}` },
+  { name: title },
+];
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <MetaTags
+      title={title}
+      description={description}
+      canonicalUrl={canonicalUrl}
+      ogImage={ogImage ?? heroImage}
+      noindex={noindex}
+      article={{
+        publishedTime: pubDate.toISOString(),
+        modifiedTime: updatedDate?.toISOString(),
+        author,
+        tags,
+      }}
+    />
+    <JsonLd
+      type="article"
+      title={title}
+      description={description}
+      url={canonicalUrl}
+      image={ogImage ?? heroImage}
+      publishedTime={pubDate.toISOString()}
+      modifiedTime={updatedDate?.toISOString()}
+      author={author}
+      breadcrumbs={breadcrumbs}
+      faq={faq}
+    />
+  </head>
+  <body>
+    <Header />
+    <main>
+      <!-- パンくずリスト -->
+      <div class="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+        <Breadcrumb
+          items={[
+            { label: 'ホーム', href: '/' },
+            { label: catInfo.label, href: `/categories/${category}` },
+            { label: title },
+          ]}
+        />
+      </div>
+
+      <div class="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+        <div class="lg:grid lg:grid-cols-[1fr_320px] lg:gap-12">
+          <!-- メインコンテンツ -->
+          <article>
+            <!-- 記事ヘッダー -->
+            <header class="mb-8">
+              <div class="mb-3 flex flex-wrap items-center gap-2">
+                <CategoryBadge category={category as CategorySlug} />
+                {tags.map((tag) => (
+                  <a
+                    href={`/tags/${tag}`}
+                    class="text-xs text-zinc-400 hover:text-primary-600 dark:text-zinc-500 dark:hover:text-primary-400 transition-colors"
+                  >
+                    #{tag}
+                  </a>
+                ))}
+              </div>
+
+              <h1 class="text-2xl font-bold leading-[1.4] text-zinc-900 dark:text-zinc-50 sm:text-3xl lg:text-4xl">
+                {title}
+              </h1>
+
+              <!-- メタ情報 -->
+              <div class="mt-4 flex flex-wrap items-center gap-4 text-sm text-zinc-500 dark:text-zinc-400">
+                <span class="font-medium text-zinc-700 dark:text-zinc-300">{author}{authorTitle ? `（${authorTitle}）` : ''}</span>
+                <span>読了 約{readingTime}分</span>
+                <time datetime={pubDate.toISOString()}>公開: {formatDate(pubDate)}</time>
+                {updatedDate && (
+                  <time datetime={updatedDate.toISOString()} class="text-accent-600 dark:text-accent-400">
+                    更新: {formatDate(updatedDate)}
+                  </time>
+                )}
+              </div>
+            </header>
+
+            <!-- アイキャッチ画像 -->
+            {
+              heroImage && (
+                <div class="mb-8 overflow-hidden rounded-xl">
+                  <img
+                    src={heroImage}
+                    alt={title}
+                    class="w-full object-cover"
+                    loading="eager"
+                    fetchpriority="high"
+                  />
+                </div>
+              )
+            }
+
+            <!-- 記事本文 -->
+            <div class="prose prose-zinc dark:prose-invert max-w-none">
+              <slot />
+            </div>
+
+            <!-- FAQ -->
+            {
+              faq && faq.length > 0 && (
+                <section class="mt-12">
+                  <h2 class="mb-4 text-xl font-bold text-zinc-900 dark:text-zinc-50">よくある質問</h2>
+                  <dl class="space-y-4">
+                    {faq.map((item) => (
+                      <details class="rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden group">
+                        <summary class="flex cursor-pointer items-center justify-between px-5 py-4 font-medium text-zinc-900 dark:text-zinc-50 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors select-none">
+                          <dt class="pr-4">{item.question}</dt>
+                          <span class="flex-shrink-0 text-zinc-400 group-open:rotate-180 transition-transform">▼</span>
+                        </summary>
+                        <dd class="px-5 pb-4 pt-2 text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                          {item.answer}
+                        </dd>
+                      </details>
+                    ))}
+                  </dl>
+                </section>
+              )
+            }
+
+            <!-- 著者カード -->
+            <div class="mt-12 rounded-xl bg-zinc-50 p-6 dark:bg-zinc-800/50">
+              <div class="flex items-start gap-4">
+                <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 font-bold text-lg">
+                  {author.charAt(0)}
+                </div>
+                <div>
+                  <p class="font-bold text-zinc-900 dark:text-zinc-50">{author}</p>
+                  {authorTitle && <p class="text-sm text-zinc-500 dark:text-zinc-400">{authorTitle}</p>}
+                  <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                    AI×人事労務メディア 編集部
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 関連記事 -->
+            <slot name="related" />
+          </article>
+
+          <!-- サイドバー -->
+          <aside class="hidden lg:block">
+            <div class="sticky top-24 space-y-6">
+              <!-- 目次 -->
+              {
+                tocItems.length > 0 && (
+                  <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
+                    <TableOfContents headings={tocItems} client:load />
+                  </div>
+                )
+              }
+
+              <!-- カテゴリ -->
+              <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
+                <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                  カテゴリ
+                </p>
+                <ul class="space-y-2">
+                  {
+                    Object.entries(CATEGORIES).map(([slug, cat]) => (
+                      <li>
+                        <a
+                          href={`/categories/${slug}`}
+                          class="flex items-center justify-between text-sm text-zinc-600 hover:text-primary-600 dark:text-zinc-400 dark:hover:text-primary-400 transition-colors"
+                        >
+                          {cat.label}
+                          <span aria-hidden="true">→</span>
+                        </a>
+                      </li>
+                    ))
+                  }
+                </ul>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
+    <Footer />
+  </body>
+</html>

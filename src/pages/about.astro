@@ -1,0 +1,59 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { SITE, CATEGORIES } from '@/config/site';
+---
+
+<BaseLayout
+  title={`このメディアについて | ${SITE.name}`}
+  description="AI×人事労務メディアのコンセプト、テーマ、運営方針についてご紹介します。"
+>
+  <div class="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
+    <header class="mb-12 text-center">
+      <div class="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-600 text-white text-2xl font-bold">
+        AI
+      </div>
+      <h1 class="text-3xl font-bold text-zinc-900 dark:text-zinc-50 sm:text-4xl">
+        {SITE.name}
+      </h1>
+      <p class="mt-4 text-xl text-zinc-500 dark:text-zinc-400 leading-relaxed">
+        {SITE.tagline}
+      </p>
+    </header>
+
+    <div class="prose prose-zinc dark:prose-invert max-w-none">
+      <h2>このメディアについて</h2>
+      <p>
+        {SITE.name} は、「AI・自動化技術」と「人事労務の実務」を掛け合わせたB2Bメディアです。
+        社会保険労務士、中小企業の人事担当者、経営者の方々が直面する「複雑な実務」や「法改正への対応」を、
+        エンジニアリング視点でロジカルに整理し、AIと自動化ツールを活用した解決策を実践レベルで発信します。
+      </p>
+
+      <h2>こんな方に向けています</h2>
+      <ul>
+        <li>社会保険労務士・社労士事務所のスタッフ</li>
+        <li>中小企業（従業員50名以下）の人事・総務担当者</li>
+        <li>ベンチャー企業の経営者・管理部門責任者</li>
+        <li>人事労務×AIの最新動向を追いたいビジネスパーソン</li>
+      </ul>
+
+      <h2>扱うテーマ</h2>
+
+      {Object.entries(CATEGORIES).map(([slug, cat]) => (
+        <div class="not-prose mb-4 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
+          <a href={`/categories/${slug}`} class="font-bold text-primary-600 dark:text-primary-400 hover:underline">
+            {cat.label}
+          </a>
+          <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{cat.description}</p>
+        </div>
+      ))}
+
+      <h2>コンテンツポリシー</h2>
+      <ul>
+        <li>掲載情報には公開時点の情報源（厚生労働省・官公庁の資料等）を明記します</li>
+        <li>記事の公開日・更新日を必ず表示します</li>
+        <li>AIが生成したコンテンツには人間によるレビューを実施します</li>
+        <li>法律・税務・労務に関する具体的な判断は専門家への相談を推奨します</li>
+      </ul>
+    </div>
+  </div>
+</BaseLayout>

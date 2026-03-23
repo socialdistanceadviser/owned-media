@@ -1,0 +1,109 @@
+---
+import { SITE } from '@/config/site';
+
+interface FaqItem {
+  question: string;
+  answer: string;
+}
+
+interface BreadcrumbItem {
+  name: string;
+  url?: string;
+}
+
+interface Props {
+  type: 'website' | 'article';
+  title?: string;
+  description?: string;
+  url?: string;
+  image?: string;
+  publishedTime?: string;
+  modifiedTime?: string;
+  author?: string;
+  breadcrumbs?: BreadcrumbItem[];
+  faq?: FaqItem[];
+}
+
+const {
+  type,
+  title,
+  description,
+  url = Astro.url.href,
+  image,
+  publishedTime,
+  modifiedTime,
+  author,
+  breadcrumbs,
+  faq,
+} = Astro.props;
+
+const organizationSchema = {
+  '@type': 'Organization',
+  name: SITE.name,
+  url: SITE.url,
+};
+
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: SITE.name,
+  url: SITE.url,
+  description: SITE.description,
+  publisher: organizationSchema,
+};
+
+const articleSchema =
+  type === 'article'
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: title,
+        description,
+        image,
+        datePublished: publishedTime,
+        dateModified: modifiedTime ?? publishedTime,
+        author: {
+          '@type': 'Person',
+          name: author ?? SITE.author,
+        },
+        publisher: organizationSchema,
+        mainEntityOfPage: {
+          '@type': 'WebPage',
+          '@id': url,
+        },
+      }
+    : null;
+
+const breadcrumbSchema = breadcrumbs
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: breadcrumbs.map((item, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: item.name,
+        ...(item.url ? { item: item.url } : {}),
+      })),
+    }
+  : null;
+
+const faqSchema = faq
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faq.map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.answer,
+        },
+      })),
+    }
+  : null;
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
+{articleSchema && <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />}
+{breadcrumbSchema && <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />}
+{faqSchema && <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}

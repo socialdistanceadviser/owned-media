@@ -1,0 +1,78 @@
+---
+import { SITE, CATEGORIES } from '@/config/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-20 border-t border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
+  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+      <!-- ブランド -->
+      <div class="lg:col-span-2">
+        <a href="/" class="flex items-center gap-2 mb-4">
+          <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600 text-white text-sm font-bold">
+            AI
+          </div>
+          <span class="font-bold text-zinc-900 dark:text-zinc-50">{SITE.name}</span>
+        </a>
+        <p class="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-xs">
+          {SITE.description}
+        </p>
+      </div>
+
+      <!-- カテゴリ -->
+      <div>
+        <h3 class="mb-4 text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+          カテゴリ
+        </h3>
+        <ul class="space-y-2">
+          {
+            Object.entries(CATEGORIES).map(([slug, cat]) => (
+              <li>
+                <a
+                  href={`/categories/${slug}`}
+                  class="text-sm text-zinc-600 hover:text-primary-600 dark:text-zinc-400 dark:hover:text-primary-400 transition-colors"
+                >
+                  {cat.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <!-- リンク -->
+      <div>
+        <h3 class="mb-4 text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+          リンク
+        </h3>
+        <ul class="space-y-2">
+          <li>
+            <a href="/about" class="text-sm text-zinc-600 hover:text-primary-600 dark:text-zinc-400 dark:hover:text-primary-400 transition-colors">
+              このメディアについて
+            </a>
+          </li>
+          <li>
+            <a href="/articles" class="text-sm text-zinc-600 hover:text-primary-600 dark:text-zinc-400 dark:hover:text-primary-400 transition-colors">
+              記事一覧
+            </a>
+          </li>
+          <li>
+            <a href="/rss.xml" class="text-sm text-zinc-600 hover:text-primary-600 dark:text-zinc-400 dark:hover:text-primary-400 transition-colors">
+              RSS フィード
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-8 border-t border-zinc-200 dark:border-zinc-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="text-xs text-zinc-400 dark:text-zinc-500">
+        © {year} {SITE.name}. All rights reserved.
+      </p>
+      <p class="text-xs text-zinc-400 dark:text-zinc-500">
+        掲載情報は記事公開時点のものです。法改正等により内容が変更になる場合があります。
+      </p>
+    </div>
+  </div>
+</footer>

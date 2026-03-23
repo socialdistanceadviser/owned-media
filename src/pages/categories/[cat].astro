@@ -1,0 +1,35 @@
+---
+import ListLayout from '@/layouts/ListLayout.astro';
+import ArticleCard from '@/components/article/ArticleCard.astro';
+import { getArticlesByCategory } from '@/lib/articles';
+import { CATEGORIES, type CategorySlug } from '@/config/site';
+
+export async function getStaticPaths() {
+  return Object.keys(CATEGORIES).map((cat) => ({
+    params: { cat },
+  }));
+}
+
+const { cat } = Astro.params;
+const catInfo = CATEGORIES[cat as CategorySlug];
+const articles = await getArticlesByCategory(cat);
+---
+
+<ListLayout
+  title={`${catInfo.label}の記事一覧`}
+  description={catInfo.description}
+  heading={catInfo.label}
+  subheading={`${catInfo.description}（${articles.length}件）`}
+>
+  {
+    articles.length === 0 ? (
+      <p class="text-center text-zinc-400 py-16">このカテゴリの記事はまだありません。</p>
+    ) : (
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {articles.map((article) => (
+          <ArticleCard article={article} />
+        ))}
+      </div>
+    )
+  }
+</ListLayout>
